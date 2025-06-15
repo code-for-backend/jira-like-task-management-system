@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 @NoArgsConstructor
 @Entity
 public class Task {
@@ -29,12 +31,19 @@ public class Task {
     private User user;
 
 
+    //New task may or may not have an assignee so nullable=true
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="assignee")
+    private User assignee;
+
+
 
     public Task(String title, String description,User user) {
 
         this.title = title;
         this.description = description;
         this.user = user;
+       // this.assignee=assignee;
     }
 
 
@@ -82,5 +91,14 @@ public class Task {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+
+    public Optional<User> getAssignee() {
+        return Optional.ofNullable(user);
+    }
+
+    public void setAssignee(User assignee) {
+        this.assignee = assignee;
     }
 }
