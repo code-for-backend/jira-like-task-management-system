@@ -6,10 +6,12 @@ import com.example.task_management_system.dto.TaskResponseDTO;
 import com.example.task_management_system.dto.TaskStatusDTO;
 import com.example.task_management_system.entities.Task;
 import com.example.task_management_system.entities.User;
+import com.example.task_management_system.exception_handler.TaskAccessDeniedException;
 import com.example.task_management_system.service.TaskService;
 import com.example.task_management_system.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,10 +46,10 @@ private final UserService userService;
 
 //Get list of tasks sorted by newest first ,optionally takes an author to get the list of tasks by author
     @GetMapping("/api/tasks")
-    public ResponseEntity<List<TaskResponseDTO>> tasks(@RequestParam(required = false) String author)
+    public ResponseEntity<List<TaskResponseDTO>> tasks(@RequestParam(required = false) String author,@RequestParam(required = false) String assignee)
     {
-
-        List<TaskResponseDTO> tasks=taskService.findTasks(author);
+//find all tasks by a given author
+        List<TaskResponseDTO> tasks=taskService.findTasks(author,assignee);
         return ResponseEntity.status(200).body(tasks);
     }
 
@@ -68,7 +70,25 @@ private final UserService userService;
 @PutMapping("/api/tasks/{taskId}/status")
     public ResponseEntity<TaskResponseDTO> updateTaskStatus(@Valid @RequestBody TaskStatusDTO taskStatusDTO,@PathVariable long taskId)
     {
-        System.out.println("Task id is "+taskId);
+        //We need to check if the current user is either the author or the assignee of the task
+        //since only these both can update the task status
+
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails=(UserDetails)authentication.getPrincipal();
+        String email=userDetails.getUsername();
+
+        Task task=taskService.findTask(taskId);
+        String taskAuthor=task.getUser().getEmail();//author of the task
+        var assigneeTask=task.getAssignee().map(assignee->assignee.getEmail());
+
+        boolean isAuthor=email.equals(taskAuthor); //if current user is the taskAuthor
+        boolean isAssignee=assigneeTask.map(assigneeEmail->email.equals(assigneeEmail)).orElse(false);//if current user is the assignee for the task
+
+        if(!isAuthor&&!isAssignee)
+            throw new TaskAccessDeniedException("Task status can be updated only by the author or assignee for the task");//I was having problem with AcessDeniedException
+        //so using custom AccessDeniedException
+
+       // System.out.println("Task id is "+taskId);
         TaskResponseDTO updatedTask=taskService.updateTaskStatus(taskStatusDTO,taskId);
 
         return ResponseEntity.status(200).body(updatedTask);

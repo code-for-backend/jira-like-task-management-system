@@ -13,6 +13,7 @@ import com.example.task_management_system.repository.TaskRepository;
 import com.example.task_management_system.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,12 +38,24 @@ public class TaskService {
     }
 
 
-    public List<TaskResponseDTO> findTasks(String author)
+    public List<TaskResponseDTO> findTasks(String author,String assignee)
     {
+        System.out.println("author is "+author+" and assigne is "+assignee);
+        List<Task> tasks=new ArrayList<>();
 
-        List<Task> tasks=(author==null)?taskRepository.findAllOrderByCreationTimeDesc():
-                taskRepository.findTasksByUserEmailOrderByCreationTimeDesc(author);
+        //if author and assignee not provided
+        if(author==null&&assignee==null)
+            tasks.addAll(taskRepository.findAllOrderByCreationTimeDesc());
 
+        //If author is provided and exists
+        if(author!=null&&userRepository.existsByEmailIgnoreCase(author))
+            tasks.addAll(taskRepository.findTasksByUserEmailOrderByCreationTimeDesc(author));
+
+        //if assignee is provided and exists
+        if(assignee!=null&&userRepository.existsByEmailIgnoreCase(assignee))
+            tasks.addAll(taskRepository.findTasksByAssigneeEmailOrderByCreationTimeDesc(assignee));
+
+        System.out.println(tasks);
         return tasks.stream().map(task->modelMapper.convertTaskToDTO(task)).collect(Collectors.toList());
 
 
@@ -71,6 +84,12 @@ public class TaskService {
         Task savedTask=taskRepository.save(task);
 
         return modelMapper.convertTaskToDTO(savedTask);
+    }
+
+
+    public Task findTask(long id)
+    {
+        return taskRepository.findById(id).orElseThrow(()->new TaskNotFoundException("Task with id "+id+" does not exists"));
     }
 }
 

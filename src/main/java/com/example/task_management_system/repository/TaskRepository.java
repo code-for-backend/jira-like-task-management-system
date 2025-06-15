@@ -21,7 +21,10 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
     @Query("SELECT t FROM Task t ORDER BY t.creationTime DESC")
     List<Task> findAllOrderByCreationTimeDesc();
 
+        //find all tasks assigned to assignee with email
 
+    @Query("SELECT t FROM Task t WHERE t.assignee.email = :email ORDER BY t.creationTime DESC")
+    List<Task> findTasksByAssigneeEmailOrderByCreationTimeDesc(@Param("email") String email);
 
 
 }

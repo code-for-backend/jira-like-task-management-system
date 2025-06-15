@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
 
+    }
+
+    @ExceptionHandler(TaskAccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(TaskAccessDeniedException e)
+    {
+        System.out.println("Access denied 403");
+        return ResponseEntity.status(403).body(e.getMessage());
     }
 
 
