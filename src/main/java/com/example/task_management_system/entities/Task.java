@@ -95,7 +95,7 @@ public class Task {
 
 
     public Optional<User> getAssignee() {
-        return Optional.ofNullable(user);
+        return Optional.ofNullable(assignee);
     }
 
     public void setAssignee(User assignee) {

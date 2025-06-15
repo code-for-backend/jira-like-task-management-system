@@ -31,7 +31,8 @@ public class ModelMapper {
 
     public TaskResponseDTO convertTaskToDTO(Task task)
     {
-        return new TaskResponseDTO(task.getId(),task.getTitle(),task.getDescription(),task.getStatus(),task.getUser().getEmail());
+        return new TaskResponseDTO(task.getId(),task.getTitle(),task.getDescription(),task.getStatus()
+                ,task.getUser().getEmail(),task.getAssignee().map(user->user.getEmail()).orElse("none"));
     }
 
 

@@ -9,13 +9,15 @@ public class TaskResponseDTO {
     private String description;
     private String status;
     private String author;
+    private String assignee;
 
-    public TaskResponseDTO(Long id, String title, String description, String status, String author) {
+    public TaskResponseDTO(Long id, String title, String description, String status, String author,String assignee) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.author=author;
+        this.assignee=assignee;
     }
 
     public Long getId() {
@@ -56,5 +58,13 @@ public class TaskResponseDTO {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.task_management_system.controller;
 
+import com.example.task_management_system.dto.TaskAssigneeDTO;
 import com.example.task_management_system.dto.TaskDTO;
 import com.example.task_management_system.dto.TaskResponseDTO;
 import com.example.task_management_system.dto.TaskStatusDTO;
@@ -75,6 +76,15 @@ private final UserService userService;
     }
 
     //each user can be assigned many tasks but each task must be assigned to one one and only one user
+    //assign the task to a user
+    @PutMapping("/api/tasks/{taskId}/assign")
+    public ResponseEntity<TaskResponseDTO> updateAssignee(@Valid @RequestBody TaskAssigneeDTO taskAssigneeDTO,@PathVariable long taskId)
+    {
+        TaskResponseDTO taskResponseDTO=taskService.assignTask(taskAssigneeDTO,taskId);
 
+        return ResponseEntity.status(200).body(taskResponseDTO);
+
+
+    }
 
 }
