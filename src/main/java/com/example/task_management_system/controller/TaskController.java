@@ -2,6 +2,7 @@ package com.example.task_management_system.controller;
 
 import com.example.task_management_system.dto.TaskDTO;
 import com.example.task_management_system.dto.TaskResponseDTO;
+import com.example.task_management_system.dto.TaskStatusDTO;
 import com.example.task_management_system.entities.Task;
 import com.example.task_management_system.entities.User;
 import com.example.task_management_system.service.TaskService;
@@ -12,10 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,4 +49,32 @@ private final UserService userService;
         List<TaskResponseDTO> tasks=taskService.findTasks(author);
         return ResponseEntity.status(200).body(tasks);
     }
+
+    //update the status of the task
+
+    /*
+
+   Note in postman directly send the enum as request body
+
+   e.g  "COMPLETED" or "IN_PROGRESS"
+   makes sense since it's an enum
+
+   Or we can use a wrapper to wrap the enum value.
+
+   The first option was chosen here
+     */
+
+@PutMapping("/api/tasks/{taskId}/status")
+    public ResponseEntity<TaskResponseDTO> updateTaskStatus(@Valid @RequestBody TaskStatusDTO taskStatusDTO,@PathVariable long taskId)
+    {
+        System.out.println("Task id is "+taskId);
+        TaskResponseDTO updatedTask=taskService.updateTaskStatus(taskStatusDTO,taskId);
+
+        return ResponseEntity.status(200).body(updatedTask);
+
+    }
+
+    //each user can be assigned many tasks but each task must be assigned to one one and only one user
+
+
 }

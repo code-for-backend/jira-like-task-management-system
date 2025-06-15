@@ -79,4 +79,8 @@ public class Task {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

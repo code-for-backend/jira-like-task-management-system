@@ -2,8 +2,10 @@ package com.example.task_management_system.service;
 
 import com.example.task_management_system.dto.TaskDTO;
 import com.example.task_management_system.dto.TaskResponseDTO;
+import com.example.task_management_system.dto.TaskStatusDTO;
 import com.example.task_management_system.entities.Task;
 import com.example.task_management_system.entities.User;
+import com.example.task_management_system.exception_handler.TaskNotFoundException;
 import com.example.task_management_system.mapper.ModelMapper;
 import com.example.task_management_system.repository.TaskRepository;
 import com.example.task_management_system.repository.UserRepository;
@@ -41,6 +43,15 @@ public class TaskService {
 
         return tasks.stream().map(task->modelMapper.convertTaskToDTO(task)).collect(Collectors.toList());
 
+
+    }
+
+
+    public TaskResponseDTO updateTaskStatus(TaskStatusDTO taskStatusDTO,long id)
+    {
+        Task task=taskRepository.findById(id).orElseThrow(()->new TaskNotFoundException("Task with id not found"));
+        task.setStatus(taskStatusDTO.toString());
+        return modelMapper.convertTaskToDTO(taskRepository.save(task));
 
     }
 }
