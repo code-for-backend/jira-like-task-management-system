@@ -1,6 +1,7 @@
 package com.example.task_management_system.dto;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class TaskAssigneeDTO {
     @NotBlank
     @Valid
+    @Email
     private String assignee;
 
 

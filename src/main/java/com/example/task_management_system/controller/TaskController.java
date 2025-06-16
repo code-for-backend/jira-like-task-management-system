@@ -97,9 +97,20 @@ private final UserService userService;
 
     //each user can be assigned many tasks but each task must be assigned to one one and only one user
     //assign the task to a user
+    //only authors can assign task to others
     @PutMapping("/api/tasks/{taskId}/assign")
     public ResponseEntity<TaskResponseDTO> updateAssignee(@Valid @RequestBody TaskAssigneeDTO taskAssigneeDTO,@PathVariable long taskId)
     {
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails=(UserDetails)authentication.getPrincipal();
+        String currentUser=userDetails.getUsername();
+
+        Task task=taskService.findTask(taskId);
+        String taskAuthor=task.getUser().getEmail();
+       //if current user is not the author
+        if(!taskAuthor.equals(currentUser))
+            throw new TaskAccessDeniedException("Task can only be assigned by the task author!");
+
         TaskResponseDTO taskResponseDTO=taskService.assignTask(taskAssigneeDTO,taskId);
 
         return ResponseEntity.status(200).body(taskResponseDTO);
